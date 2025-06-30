@@ -1,24 +1,19 @@
 {
   "name": "bank-sim",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "concurrently \"npm --prefix front start\" \"npm --prefix back start\"",
+    "build": "concurrently \"npm --prefix front run build\" \"npm --prefix back run build\"",
+    "dev": "concurrently \"npm --prefix front run dev\" \"npm --prefix back run dev\"",
+    "setup": "npm ci && cd front && npm ci && cd ../back && npm ci"
   },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "next": "15.3.4"
-  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "concurrently": "^9.2.0"
   }
 }

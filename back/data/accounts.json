@@ -1,0 +1,18 @@
+[
+  {
+    "id": "0421",
+    "name": "Alice",
+    "balance": 5000,
+    "lastAction": null,
+    "lastTransaction": null,
+    "loanTime": null
+  },
+  {
+    "id": "1337",
+    "name": "Bob",
+    "balance": 3000,
+    "lastAction": null,
+    "lastTransaction": null,
+    "loanTime": null
+  }
+]
