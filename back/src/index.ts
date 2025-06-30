@@ -21,13 +21,16 @@ app.get("/accounts", async (_req, res) => {
   res.json(JSON.parse(data));
 });
 
-/* // GET specific account by ID
+// GET specific account by ID
 app.get("/accounts/:id", async (req, res) => {
   const { id } = req.params;
   const data = await fs.readFile(dataPath, "utf-8");
   const accounts = JSON.parse(data);
   const account = accounts.find((a: any) => a.id === id);
-  if (!account) return res.status(404).json({ error: "Account not found" });
+  if (!account) {
+    res.status(404).json({ error: "Account not found" });
+    return;
+  }
   res.json(account);
 });
 
@@ -39,13 +42,16 @@ app.put("/accounts/:id", async (req, res) => {
   const data = await fs.readFile(dataPath, "utf-8");
   const accounts = JSON.parse(data);
   const index = accounts.findIndex((a: any) => a.id === id);
-  if (index === -1) return res.status(404).json({ error: "Account not found" });
+  if (index === -1) {
+    res.status(404).json({ error: "Account not found" });
+    return;
+  }
 
   accounts[index] = updatedAccount;
   await fs.writeFile(dataPath, JSON.stringify(accounts, null, 2));
   res.json({ message: "Account updated" });
 });
- */
+
 app.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`);
 });

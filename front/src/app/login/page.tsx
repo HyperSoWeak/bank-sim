@@ -4,37 +4,30 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-type Account = {
-  id: string;
-  name: string;
-  balance: number;
-};
-
 export default function LoginPage() {
   const [userId, setUserId] = useState("");
   const [error, setError] = useState("");
-  const [accounts, setAccounts] = useState<Account[]>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    fetch("/data/accounts.json")
-      .then((res) => res.json())
-      .then((data) => setAccounts(data))
-      .catch(() => setAccounts([]));
-  }, []);
-
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!/^\d{4}$/.test(userId)) {
       setError("Please enter a valid 4-digit User ID.");
       return;
     }
 
-    const found = accounts.find((acc) => acc.id === userId);
-    if (found) {
+    try {
+      const res = await fetch(`http://localhost:4000/accounts/${userId}`);
+      if (!res.ok) {
+        setError("Account not found.");
+        return;
+      }
+
+      localStorage.setItem("banksim-login-time", Date.now().toString());
       setError("");
       router.push(`/account/${userId}`);
-    } else {
-      setError("Account not found.");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to connect to server.");
     }
   };
 
