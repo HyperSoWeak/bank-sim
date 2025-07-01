@@ -10,6 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 const dataPath = path.join(__dirname, "..", "data", "accounts.json");
+const stocksPath = path.join(__dirname, "..", "data", "stocks.json");
 
 app.get("/", (_req, res) => {
   res.send("Welcome to the Bank Simulation Backend!");
@@ -52,6 +53,23 @@ app.put("/accounts/:id", async (req, res) => {
   res.json({ message: "Account updated" });
 });
 
+app.get("/stocks", async (req, res) => {
+  try {
+    const data = await fs.readFile(stocksPath, "utf-8");
+    const json = JSON.parse(data);
+    res.json(json);
+  } catch (err) {
+    console.error("Failed to load stock data:", err);
+    res.status(500).json({ error: "Failed to read stock data" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`);
 });
+
+import updateStocks from "./stock";
+
+setInterval(() => {
+  updateStocks().catch(console.error);
+}, 1_000); // every 60 seconds
