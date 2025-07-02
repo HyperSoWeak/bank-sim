@@ -64,6 +64,33 @@ app.get("/stocks", async (req, res) => {
   }
 });
 
+// POST update a single stock's control values
+app.post("/stocks/:symbol", async (req, res) => {
+  const { symbol } = req.params;
+  const { target, remaining, stability } = req.body;
+
+  try {
+    const data = await fs.readFile(stocksPath, "utf-8");
+    const json = JSON.parse(data);
+
+    if (!json.stocks[symbol]) {
+      res.status(404).json({ error: "Stock not found" });
+      return;
+    }
+
+    // Update stock control parameters
+    json.stocks[symbol].target = target;
+    json.stocks[symbol].remaining = remaining;
+    json.stocks[symbol].stability = stability;
+
+    await fs.writeFile(stocksPath, JSON.stringify(json, null, 2));
+    res.json({ message: `Stock ${symbol} updated.` });
+  } catch (err) {
+    console.error("Failed to update stock:", err);
+    res.status(500).json({ error: "Failed to update stock" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`);
 });
