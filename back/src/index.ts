@@ -68,9 +68,9 @@ app.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`);
 });
 
-import updateStocks from "./stock";
+import { updateStocks } from "./stock";
 import { STOCK_UPDATE_INTERVAL_MS } from "../shared/constants";
 
 setInterval(() => {
   updateStocks().catch(console.error);
-}, STOCK_UPDATE_INTERVAL_MS); // every 60 seconds
+}, STOCK_UPDATE_INTERVAL_MS);

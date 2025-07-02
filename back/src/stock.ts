@@ -1,30 +1,40 @@
 import fs from "fs/promises";
 import path from "path";
+import { StockData } from "./types";
 
 const file = path.join(__dirname, "../data/stocks.json");
-import { STOCK_UPDATE_INTERVAL_MS } from "../shared/constants";
 
-const updateStocks = async () => {
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
+}
+
+function randomInRange(min: number, max: number): number {
+  return Math.random() * (max - min) + min;
+}
+
+export const updateStocks = async () => {
   const content = await fs.readFile(file, "utf-8");
-  const data = JSON.parse(content);
-  const now = new Date();
-  const last = new Date(data.meta.lastUpdate);
-  const minsPassed = Math.floor((now.getTime() - last.getTime()) / STOCK_UPDATE_INTERVAL_MS);
-  if (minsPassed < 1) return; // already updated
+  const data = JSON.parse(content) as StockData;
 
-  ["AAPL", "GOOG", "TSLA"].forEach((key) => {
-    const prev = data[key][data[key].length - 1];
-    const trend = data.meta.trend[key];
-    const random = (Math.random() - 0.5) * 0.004;
-    const change = trend + random;
-    const newPrice = parseFloat((prev * (1 + change)).toFixed(2));
-    data[key].push(newPrice);
-  });
+  for (const name of Object.keys(data.stocks)) {
+    const stock = data.stocks[name];
+    const currentPrice = stock.price[stock.price.length - 1];
 
-  data.meta.lastUpdate = now.toISOString();
+    const t = stock.remaining > 0 ? 1 / stock.remaining : 1;
+    const base = lerp(currentPrice, stock.target, t);
+    const noise = (Math.random() - 0.5) * stock.stability;
+    const nextPrice = parseFloat((base * (1 + noise)).toFixed(2));
+
+    stock.price.push(nextPrice);
+    stock.remaining -= 1;
+
+    if (stock.remaining <= 0) {
+      const percentChange = randomInRange(-0.05, 0.05); // ±5%
+      stock.target = parseFloat((nextPrice * (1 + percentChange)).toFixed(2));
+      stock.remaining = Math.floor(randomInRange(7, 14));
+    }
+  }
+
+  data.lastUpdate = new Date().toISOString();
   await fs.writeFile(file, JSON.stringify(data, null, 2));
-
-  console.log("Stocks updated:", data);
 };
-
-export default updateStocks;

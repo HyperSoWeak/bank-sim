@@ -20,16 +20,10 @@
       "stability": 0.04
     },
     "AMZN": {
-      "price": [80.1],
-      "target": 85.5,
-      "remaining": 11,
-      "stability": 0.02
-    },
-    "MSFT": {
-      "price": [90.5],
-      "target": 95.0,
+      "price": [65.1],
+      "target": 59.5,
       "remaining": 8,
-      "stability": 0.03
+      "stability": 0.02
     }
   }
 }

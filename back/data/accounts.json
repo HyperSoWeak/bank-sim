@@ -2,10 +2,10 @@
   {
     "id": "0421",
     "name": "Alice",
-    "balance": 10000,
-    "lastAction": "2025-06-30T23:27:41.427Z",
-    "lastTransaction": "2025-06-30T22:38:15.226Z",
-    "loanTime": "2025-06-30T23:27:41.427Z"
+    "balance": 2.5256970328264744e+35,
+    "lastAction": "2025-07-02T18:13:09.151Z",
+    "lastTransaction": "2025-07-02T15:55:09.367Z",
+    "loanTime": null
   },
   {
     "id": "1337",
