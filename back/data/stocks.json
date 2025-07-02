@@ -3,25 +3,25 @@
   "stocks": {
     "AAPL": {
       "price": [66.3],
-      "target": 78.77,
+      "target": 90.77,
       "remaining": 12,
       "stability": 0.03
     },
     "GOOG": {
-      "price": [70.6],
-      "target": 74.25,
+      "price": [70.66],
+      "target": 51.25,
       "remaining": 9,
-      "stability": 0.01
+      "stability": 0.02
     },
     "TSLA": {
-      "price": [75.2],
-      "target": 68.23,
+      "price": [75.21],
+      "target": 71.23,
       "remaining": 10,
-      "stability": 0.04
+      "stability": 0.07
     },
     "AMZN": {
-      "price": [65.1],
-      "target": 59.5,
+      "price": [65.19],
+      "target": 59.51,
       "remaining": 8,
       "stability": 0.02
     }
