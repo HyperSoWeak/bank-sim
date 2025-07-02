@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { STOCK_UPDATE_INTERVAL_MS } from "@/shared/constants";
 
 const STOCK_API = "http://localhost:4000/stocks";
 
@@ -19,7 +20,7 @@ export default function StockPage() {
 
   useEffect(() => {
     fetchStocks();
-    const interval = setInterval(fetchStocks, 1000); // auto-refresh every minute
+    const interval = setInterval(fetchStocks, STOCK_UPDATE_INTERVAL_MS); // auto-refresh every minute
     return () => clearInterval(interval);
   }, []);
 

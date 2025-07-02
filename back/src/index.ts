@@ -69,7 +69,8 @@ app.listen(PORT, () => {
 });
 
 import updateStocks from "./stock";
+import { STOCK_UPDATE_INTERVAL_MS } from "../shared/constants";
 
 setInterval(() => {
   updateStocks().catch(console.error);
-}, 1_000); // every 60 seconds
+}, STOCK_UPDATE_INTERVAL_MS); // every 60 seconds

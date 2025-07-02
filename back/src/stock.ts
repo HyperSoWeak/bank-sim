@@ -2,13 +2,14 @@ import fs from "fs/promises";
 import path from "path";
 
 const file = path.join(__dirname, "../data/stocks.json");
+import { STOCK_UPDATE_INTERVAL_MS } from "../shared/constants";
 
 const updateStocks = async () => {
   const content = await fs.readFile(file, "utf-8");
   const data = JSON.parse(content);
   const now = new Date();
   const last = new Date(data.meta.lastUpdate);
-  const minsPassed = Math.floor((now.getTime() - last.getTime()) / 1000);
+  const minsPassed = Math.floor((now.getTime() - last.getTime()) / STOCK_UPDATE_INTERVAL_MS);
   if (minsPassed < 1) return; // already updated
 
   ["AAPL", "GOOG", "TSLA"].forEach((key) => {
