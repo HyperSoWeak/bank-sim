@@ -10,6 +10,15 @@ type Account = {
   lastAction: string | null;
   lastTransaction: string | null;
   loanTime: string | null;
+  stocks: {
+    [company: string]: number;
+  };
+};
+
+const stockPrices: { [company: string]: number } = {
+  "Company A": 120,
+  "Company B": 75,
+  "Company C": 200,
 };
 
 const MS_PER_MIN = 60 * 1000;
@@ -222,11 +231,72 @@ export default function AccountPage() {
           </div>
         </div>
 
-        {/* Right Panel */}
+        {/* Right Panel - Stock */}
         <div>
           <section className="bg-gray-900 p-6 rounded-xl border border-gray-800 shadow-xl">
             <h2 className="text-2xl font-semibold mb-4">📈 Stock</h2>
-            <p className="text-gray-400">Coming soon...</p>
+            <div className="space-y-4">
+              {Object.entries(stockPrices).map(([company, price]) => {
+                const shares = account.stocks?.[company] || 0;
+                return (
+                  <div
+                    key={company}
+                    className="flex items-center justify-between border p-3 rounded-lg shadow-sm bg-gray-800"
+                  >
+                    <div>
+                      <div className="text-lg font-semibold">{company}</div>
+                      <div className="text-sm text-gray-400">Price: ${price}</div>
+                      <div className="text-sm text-gray-400">You own: {shares} shares</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={async () => {
+                          const input = prompt(`Buy how many shares of ${company}?`);
+                          const num = Number(input);
+                          if (!input || num <= 0 || !account) return;
+                          const cost = num * price;
+                          if (cost > account.balance) return alert("Insufficient balance!");
+                          const updated = {
+                            ...account,
+                            balance: account.balance - cost,
+                            stocks: {
+                              ...account.stocks,
+                              [company]: shares + num,
+                            },
+                            lastAction: new Date().toISOString(),
+                          };
+                          await save(updated);
+                        }}
+                        className="bg-green-600 hover:bg-green-700 px-4 py-1 rounded text-white text-sm"
+                      >
+                        Buy
+                      </button>
+                      <button
+                        onClick={async () => {
+                          const input = prompt(`Sell how many shares of ${company}?`);
+                          const num = Number(input);
+                          if (!input || num <= 0 || !account || num > shares) return;
+                          const revenue = num * price;
+                          const updated = {
+                            ...account,
+                            balance: account.balance + revenue,
+                            stocks: {
+                              ...account.stocks,
+                              [company]: shares - num,
+                            },
+                            lastAction: new Date().toISOString(),
+                          };
+                          await save(updated);
+                        }}
+                        className="bg-red-600 hover:bg-red-700 px-4 py-1 rounded text-white text-sm"
+                      >
+                        Sell
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </section>
         </div>
       </div>
