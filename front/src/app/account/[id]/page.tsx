@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { StockData, StockMeta } from "@/types/stock";
 import { STOCK_UPDATE_INTERVAL_MS } from "@/shared/constants"
+import { Princess_Sofia } from "next/font/google";
 
 type Account = {
   id: string;
@@ -37,6 +38,34 @@ export default function AccountPage() {
   const [now, setNow] = useState(Date.now());
   const [loading, setLoading] = useState(true);
   const [stockData, setStockData] = useState<StockData | null>(null);
+  const [showPopup, setShowPopup] = useState(0);
+  const [selectedCompanyMeta, setSelectedCompanyMeta] = useState<StockMeta | null>(null);
+  const [selectedCompanyName, setSelectedCompanyName] = useState<string>("");
+  const [inputValue, setInputValue] = useState<number | "">("");
+
+  const handleSubmit = async () => {
+    const num = Number(inputValue);
+    if (!inputValue || num <= 0 || !account) return;
+    const price = selectedCompanyMeta?.price[selectedCompanyMeta?.price.length - 1];
+    if (!price) {
+      setShowPopup(0);
+      return;
+    } 
+    const shares = account.stocks?.[selectedCompanyName] || 0;
+    const newShare = num / price;
+    const updated = {
+      ...account,
+      stockNetWorth: showPopup == 1 ? account.stockNetWorth - num : account.stockNetWorth + num,
+      stocks: {
+        ...account.stocks,
+        [selectedCompanyName]: showPopup == 1 ? shares + newShare : shares - newShare,
+      },
+      lastAction: new Date().toISOString(),
+    };
+    await save(updated);
+    setShowPopup(0);
+    setInputValue("");
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -153,6 +182,37 @@ export default function AccountPage() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white px-6 py-8">
+      {showPopup ? (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-6 rounded-lg shadow-md w-100">
+            <h2 className="text-lg font-semibold mb-4">{
+              `${showPopup == 1 ? "Buy how much worth of shares" : "Sell how much worth of shares"} of ${selectedCompanyName}`  
+            }</h2>
+            <input
+              type="number"
+              className="w-full border px-3 py-2 rounded mb-4"
+              value={inputValue}
+              onChange={(e) =>
+                setInputValue(e.target.value === '' ? '' : Number(e.target.value))
+              }
+            />
+            <div className="flex justify-between">
+              <button
+                className="bg-red-600 px-3 py-1 rounded"
+                onClick={() => setShowPopup(0)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-green-600 text-white px-3 py-1 rounded"
+                onClick={handleSubmit}
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : <></>}
       <header className="flex items-center justify-between border-b border-gray-700 pb-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold text-white">
@@ -267,42 +327,20 @@ export default function AccountPage() {
                     </div>
                     <div className="flex gap-2">
                       <button
-                        onClick={async () => {
-                          const input = prompt(`Buy how many dollars worth of shares of ${company}?`);
-                          const num = Number(input);
-                          if (!input || num <= 0 || !account) return;
-                          const newShare = num / price;
-                          const updated = {
-                            ...account,
-                            stockNetWorth: account.stockNetWorth - num,
-                            stocks: {
-                              ...account.stocks,
-                              [company]: shares + newShare,
-                            },
-                            lastAction: new Date().toISOString(),
-                          };
-                          await save(updated);
+                        onClick={() => {
+                          setSelectedCompanyMeta(meta);
+                          setSelectedCompanyName(company);
+                          setShowPopup(1);
                         }}
                         className="bg-green-600 hover:bg-green-700 px-4 py-1 rounded text-white text-sm"
                       >
                         Buy
                       </button>
                       <button
-                        onClick={async () => {
-                          const input = prompt(`Sell how many dollars worth of shares of ${company}?`);
-                          const num = Number(input);
-                          const sellShare = num / price;
-                          if (!input || num <= 0 || !account || sellShare > shares) return;
-                          const updated = {
-                            ...account,
-                            stockNetWorth: account.stockNetWorth + num,
-                            stocks: {
-                              ...account.stocks,
-                              [company]: shares - sellShare,
-                            },
-                            lastAction: new Date().toISOString(),
-                          };
-                          await save(updated);
+                        onClick={() => {
+                          setSelectedCompanyMeta(meta);
+                          setSelectedCompanyName(company);
+                          setShowPopup(2);
                         }}
                         className="bg-red-600 hover:bg-red-700 px-4 py-1 rounded text-white text-sm"
                       >
