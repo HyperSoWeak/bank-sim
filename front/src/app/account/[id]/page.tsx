@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { StockData, StockMeta } from "@/types/stock";
 
 type Account = {
   id: string;
@@ -15,13 +16,8 @@ type Account = {
   };
 };
 
-const stockPrices: { [company: string]: number } = {
-  "Company A": 120,
-  "Company B": 75,
-  "Company C": 200,
-};
-
 const MS_PER_MIN = 60 * 1000;
+const STOCK_API = "http://localhost:4000/stocks";
 
 function calculateCompoundInterest(balance: number, mins: number) {
   const tier1 = Math.min(mins, 30);
@@ -33,21 +29,28 @@ function calculateCompoundInterest(balance: number, mins: number) {
 export default function AccountPage() {
   const { id } = useParams();
   const router = useRouter();
-
+  
   const [account, setAccount] = useState<Account | null>(null);
   const [original, setOriginal] = useState<Account | null>(null);
   const [now, setNow] = useState(Date.now());
   const [loading, setLoading] = useState(true);
+  const [stockData, setStockData] = useState<StockData | null>(null);
+  const [loginTime, setLoginTime] = useState<number>(0);
+
 
   useEffect(() => {
     const fetchData = async () => {
       const res = await fetch(`http://localhost:4000/accounts/${id}`);
       const acc = await res.json();
+      const stockRes = await fetch(STOCK_API);
+      const data = await stockRes.json();
+      setStockData(data);
       setAccount(acc);
       setOriginal(acc);
       setLoading(false);
     };
     fetchData();
+    setLoginTime(Number(localStorage.getItem("banksim-login-time") || 0));
     const interval = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(interval);
   }, [id]);
@@ -70,7 +73,6 @@ export default function AccountPage() {
   };
 
   const lastActionTime = account?.lastAction ? new Date(account.lastAction).getTime() : 0;
-  const loginTime = Number(localStorage.getItem("banksim-login-time") || 0);
   const block = loginTime - lastActionTime < 5 * MS_PER_MIN;
 
   const interestInfo = () => {
@@ -236,8 +238,9 @@ export default function AccountPage() {
           <section className="bg-gray-900 p-6 rounded-xl border border-gray-800 shadow-xl">
             <h2 className="text-2xl font-semibold mb-4">📈 Stock</h2>
             <div className="space-y-4">
-              {Object.entries(stockPrices).map(([company, price]) => {
+              {Object.entries(stockData?.stocks || {} as {[company: string]: StockMeta}).map(([company, meta]) => {
                 const shares = account.stocks?.[company] || 0;
+                const price = meta.price[meta.price.length - 1];
                 return (
                   <div
                     key={company}
