@@ -4,7 +4,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { StockData, StockMeta } from "@/types/stock";
 import { STOCK_UPDATE_INTERVAL_MS } from "@/shared/constants"
-import { Princess_Sofia } from "next/font/google";
 
 type Account = {
   id: string;
@@ -42,30 +41,7 @@ export default function AccountPage() {
   const [selectedCompanyMeta, setSelectedCompanyMeta] = useState<StockMeta | null>(null);
   const [selectedCompanyName, setSelectedCompanyName] = useState<string>("");
   const [inputValue, setInputValue] = useState<number | "">("");
-
-  const handleSubmit = async () => {
-    const num = Number(inputValue);
-    if (!inputValue || num <= 0 || !account) return;
-    const price = selectedCompanyMeta?.price[selectedCompanyMeta?.price.length - 1];
-    if (!price) {
-      setShowPopup(0);
-      return;
-    } 
-    const shares = account.stocks?.[selectedCompanyName] || 0;
-    const newShare = num / price;
-    const updated = {
-      ...account,
-      stockNetWorth: showPopup == 1 ? account.stockNetWorth - num : account.stockNetWorth + num,
-      stocks: {
-        ...account.stocks,
-        [selectedCompanyName]: showPopup == 1 ? shares + newShare : shares - newShare,
-      },
-      lastAction: new Date().toISOString(),
-    };
-    await save(updated);
-    setShowPopup(0);
-    setInputValue("");
-  };
+  const [popUpTopic, setPopUpTopic] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -89,6 +65,36 @@ export default function AccountPage() {
     const interval = setInterval(() => fetchData(), STOCK_UPDATE_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [id]);
+
+  const buySellStock = async () => {
+    const num = Number(inputValue);
+    if (!inputValue || num <= 0 || !account) return;
+    const price = selectedCompanyMeta?.price[selectedCompanyMeta?.price.length - 1];
+    if (!price) {
+      setShowPopup(0);
+      return;
+    } 
+    const shares = account.stocks?.[selectedCompanyName] || 0;
+    const newShare = num / price;
+    const updated = {
+      ...account,
+      stockNetWorth: showPopup == 1 ? account.stockNetWorth - num : account.stockNetWorth + num,
+      stocks: {
+        ...account.stocks,
+        [selectedCompanyName]: showPopup == 1 ? shares + newShare : shares - newShare,
+      },
+      lastAction: new Date().toISOString(),
+    };
+    await save(updated);
+  }
+
+  const handleSubmit = () => {
+    if (showPopup == 1 || showPopup == 2) buySellStock();
+    if (showPopup == 3) deposit();
+    if (showPopup == 4) withdraw();
+    setShowPopup(0);
+    setInputValue("");
+  };
 
   const save = async (updated: Account) => {
     await fetch(`http://localhost:4000/accounts/${id}`, {
@@ -125,8 +131,7 @@ export default function AccountPage() {
   };
 
   const deposit = async () => {
-    const input = prompt("Enter deposit amount:");
-    const amount = Number(input);
+    const amount = Number(inputValue);
     if (!amount || amount <= 0 || !account) return;
     const { total } = interestInfo();
     const updated = {
@@ -139,8 +144,7 @@ export default function AccountPage() {
   };
 
   const withdraw = async () => {
-    const input = prompt("Enter withdraw amount:");
-    const amount = Number(input);
+    const amount = Number(inputValue);
     const { total } = interestInfo();
     if (!amount || amount <= 0 || !account || amount > total) return;
     const updated = {
@@ -185,9 +189,7 @@ export default function AccountPage() {
       {showPopup ? (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg shadow-md w-100">
-            <h2 className="text-lg font-semibold mb-4">{
-              `${showPopup == 1 ? "Buy how much worth of shares" : "Sell how much worth of shares"} of ${selectedCompanyName}`  
-            }</h2>
+            <h2 className="text-lg font-semibold mb-4">{popUpTopic}</h2>
             <input
               type="number"
               className="w-full border px-3 py-2 rounded mb-4"
@@ -199,7 +201,10 @@ export default function AccountPage() {
             <div className="flex justify-between">
               <button
                 className="bg-red-600 px-3 py-1 rounded"
-                onClick={() => setShowPopup(0)}
+                onClick={() => {
+                  setShowPopup(0);
+                  setInputValue("");
+                }}
               >
                 Cancel
               </button>
@@ -249,13 +254,19 @@ export default function AccountPage() {
             </p>
             <div className="flex gap-4">
               <button
-                onClick={deposit}
+                onClick={() => {
+                  setPopUpTopic("Enter deposit amount:");
+                  setShowPopup(3);
+                }}
                 className="bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded text-white font-medium"
               >
                 Deposit
               </button>
-              <button
-                onClick={withdraw}
+              <button                
+                onClick={() => {
+                  setPopUpTopic("Enter withdraw amount:");
+                  setShowPopup(4);
+                }}
                 className="bg-red-600 hover:bg-red-700 px-5 py-2 rounded text-white font-medium"
               >
                 Withdraw
@@ -330,6 +341,7 @@ export default function AccountPage() {
                         onClick={() => {
                           setSelectedCompanyMeta(meta);
                           setSelectedCompanyName(company);
+                          setPopUpTopic(`Buy how much worth of shares of ${company}`);
                           setShowPopup(1);
                         }}
                         className="bg-green-600 hover:bg-green-700 px-4 py-1 rounded text-white text-sm"
@@ -340,6 +352,7 @@ export default function AccountPage() {
                         onClick={() => {
                           setSelectedCompanyMeta(meta);
                           setSelectedCompanyName(company);
+                          setPopUpTopic(`Sell how much worth of shares of ${company}`);
                           setShowPopup(2);
                         }}
                         className="bg-red-600 hover:bg-red-700 px-4 py-1 rounded text-white text-sm"
