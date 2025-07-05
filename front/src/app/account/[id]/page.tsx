@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { StockData, StockMeta } from "@/types/stock";
+import { STOCK_UPDATE_INTERVAL_MS } from "@/shared/constants"
 
 type Account = {
   id: string;
@@ -11,6 +12,7 @@ type Account = {
   lastAction: string | null;
   lastTransaction: string | null;
   loanTime: string | null;
+  stockNetWorth: number;
   stocks: {
     [company: string]: number;
   };
@@ -35,23 +37,27 @@ export default function AccountPage() {
   const [now, setNow] = useState(Date.now());
   const [loading, setLoading] = useState(true);
   const [stockData, setStockData] = useState<StockData | null>(null);
-  const [loginTime, setLoginTime] = useState<number>(0);
-
 
   useEffect(() => {
     const fetchData = async () => {
       const res = await fetch(`http://localhost:4000/accounts/${id}`);
       const acc = await res.json();
-      const stockRes = await fetch(STOCK_API);
-      const data = await stockRes.json();
-      setStockData(data);
       setAccount(acc);
       setOriginal(acc);
       setLoading(false);
     };
     fetchData();
-    setLoginTime(Number(localStorage.getItem("banksim-login-time") || 0));
     const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, [id]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const stockRes = await fetch(STOCK_API);
+      const data = await stockRes.json();
+      setStockData(data);
+    }
+    const interval = setInterval(() => fetchData(), STOCK_UPDATE_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [id]);
 
@@ -64,6 +70,10 @@ export default function AccountPage() {
     setAccount(updated);
   };
 
+  function trimTo2Decimals(num: number): number {
+    return Math.trunc(num * 100) / 100;
+  } 
+
   const logout = () => {
     router.push("/login");
   };
@@ -73,6 +83,7 @@ export default function AccountPage() {
   };
 
   const lastActionTime = account?.lastAction ? new Date(account.lastAction).getTime() : 0;
+  const loginTime = Number(localStorage.getItem("banksim-login-time") || 0);
   const block = loginTime - lastActionTime < 5 * MS_PER_MIN;
 
   const interestInfo = () => {
@@ -236,7 +247,10 @@ export default function AccountPage() {
         {/* Right Panel - Stock */}
         <div>
           <section className="bg-gray-900 p-6 rounded-xl border border-gray-800 shadow-xl">
-            <h2 className="text-2xl font-semibold mb-4">📈 Stock</h2>
+            <h2 className="text-2xl font-semibold mb-2">📈 Stock</h2>
+            <div className="mb-4 flex gap-1">
+              <p className="text-gray-300">Stock Net Worth: </p><p className="font-mono text-blue-400">${account.stockNetWorth}</p>
+            </div>
             <div className="space-y-4">
               {Object.entries(stockData?.stocks || {} as {[company: string]: StockMeta}).map(([company, meta]) => {
                 const shares = account.stocks?.[company] || 0;
@@ -249,22 +263,21 @@ export default function AccountPage() {
                     <div>
                       <div className="text-lg font-semibold">{company}</div>
                       <div className="text-sm text-gray-400">Price: ${price}</div>
-                      <div className="text-sm text-gray-400">You own: {shares} shares</div>
+                      <div className="text-sm text-gray-400">You own: ${trimTo2Decimals(shares * price)}</div>
                     </div>
                     <div className="flex gap-2">
                       <button
                         onClick={async () => {
-                          const input = prompt(`Buy how many shares of ${company}?`);
+                          const input = prompt(`Buy how many dollars worth of shares of ${company}?`);
                           const num = Number(input);
                           if (!input || num <= 0 || !account) return;
-                          const cost = num * price;
-                          if (cost > account.balance) return alert("Insufficient balance!");
+                          const newShare = num / price;
                           const updated = {
                             ...account,
-                            balance: account.balance - cost,
+                            stockNetWorth: account.stockNetWorth - num,
                             stocks: {
                               ...account.stocks,
-                              [company]: shares + num,
+                              [company]: shares + newShare,
                             },
                             lastAction: new Date().toISOString(),
                           };
@@ -276,16 +289,16 @@ export default function AccountPage() {
                       </button>
                       <button
                         onClick={async () => {
-                          const input = prompt(`Sell how many shares of ${company}?`);
+                          const input = prompt(`Sell how many dollars worth of shares of ${company}?`);
                           const num = Number(input);
-                          if (!input || num <= 0 || !account || num > shares) return;
-                          const revenue = num * price;
+                          const sellShare = num / price;
+                          if (!input || num <= 0 || !account || sellShare > shares) return;
                           const updated = {
                             ...account,
-                            balance: account.balance + revenue,
+                            stockNetWorth: account.stockNetWorth + num,
                             stocks: {
                               ...account.stocks,
-                              [company]: shares - num,
+                              [company]: shares - sellShare,
                             },
                             lastAction: new Date().toISOString(),
                           };
