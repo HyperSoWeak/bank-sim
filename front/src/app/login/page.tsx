@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   const [userId, setUserId] = useState("");
@@ -36,35 +37,42 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex items-center justify-center min-h-screen bg-gray-900 px-4">
-      <div className="w-full max-w-md p-8 bg-gray-800 rounded-lg shadow-lg">
-        <h1 className="text-2xl font-semibold text-white mb-6 text-center">User Login</h1>
+    <main className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-4">
+      <div className="w-full max-w-md p-10 bg-gray-850 rounded-2xl shadow-2xl ring-1 ring-gray-700/50">
+        <h1 className="text-3xl font-bold text-white text-center mb-8 tracking-tight">🔐 User Login</h1>
 
-        <label htmlFor="userId" className="block text-sm font-medium text-gray-300 mb-2">
-          Enter your 4-digit User ID
-        </label>
-        <input
-          id="userId"
-          type="text"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="e.g. 0421"
-          className="w-full px-4 py-2 bg-gray-700 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-
-        {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
+        <div className="mb-6">
+          <label htmlFor="userId" className="block text-sm font-medium text-gray-300 mb-2">
+            Enter your 4-digit User ID
+          </label>
+          <input
+            id="userId"
+            type="text"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="e.g. 0421"
+            className="w-full px-4 py-3 bg-gray-700 text-white rounded-xl border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner"
+          />
+          {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
+        </div>
 
         <button
           onClick={handleLogin}
-          className="w-full mt-6 py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          className="w-full py-3 px-6 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 transition rounded-xl text-white font-medium shadow-md hover:shadow-lg"
         >
           Login
         </button>
 
-        <Link href="/" className="block text-center mt-6 text-sm text-gray-400 hover:underline">
-          Back to Main Page
-        </Link>
+        <div className="mt-8 text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center justify-center gap-2 text-sm text-gray-400 hover:text-gray-200 transition hover:underline"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Home
+          </Link>
+        </div>
       </div>
     </main>
   );

@@ -41,7 +41,14 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, []);
 
-  if (!stockData) return <div className="text-white p-6">Loading...</div>;
+  if (!stockData)
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white px-6 py-16 space-y-10">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold tracking-tight mb-2">Loading dashboard...</h1>
+        </div>
+      </main>
+    );
 
   const { stocks } = stockData;
   const stockKeys = Object.keys(stocks);
@@ -71,67 +78,61 @@ export default function DashboardPage() {
     return num >= 0 ? `+${num}` : num;
   };
 
-  const commonColors = [
-    "#8884d8",
-    "#82ca9d",
-    "#ffc658",
-    "#ff7300",
-    "#0088FE",
-    "#00C49F",
-    "#FFBB28",
-    "#FF8042",
-    "#AF19FF",
-    "#DE3163",
-  ];
+  const commonColors = ["#00C49F", "#8884d8", "#FFBB28", "#FF8042", "#AF19FF", "#DE3163"];
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white p-6 space-y-6">
-      <h1 className="text-3xl font-bold">🛠️ Stock Control Dashboard</h1>
+    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white px-6 py-16 space-y-10">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold tracking-tight mb-2">🛠️ Stock Control Dashboard</h1>
+        <p className="text-gray-400 text-sm">Manage live market parameters in real time</p>
+      </div>
 
-      <div
-        className="grid gap-6 text-sm"
-        style={{
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-        }}
-      >
+      <section className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
         {stockKeys.map((key) => (
-          <div key={key} className="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow text-center">
+          <div
+            key={key}
+            className="bg-gray-850 p-6 rounded-xl shadow-md ring-1 ring-gray-700/50 text-center transition hover:shadow-xl"
+          >
             <h2 className="text-lg font-semibold mb-2">{key}</h2>
-            <p className="text-blue-400 text-xl font-mono">${current[key].toFixed(2)}</p>
-            <p className={`mt-1 ${Number(diff[key]) >= 0 ? "text-red-400" : "text-green-400"}`}>
+            <p className="text-blue-400 text-2xl font-mono">${current[key].toFixed(2)}</p>
+            <p className={`mt-2 text-md font-medium ${Number(diff[key]) >= 0 ? "text-green-400" : "text-red-400"}`}>
               {numberWithSign(Number(diff[key]))}%
             </p>
           </div>
         ))}
-      </div>
+      </section>
 
-      <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={chartData}>
-          <XAxis dataKey="name" stroke="#888" />
-          <YAxis stroke="#888" domain={["auto", "auto"]} />
-          <Tooltip />
-          <Legend />
-          {stockKeys.map((key, index) => (
-            <Line
-              key={key}
-              type="monotone"
-              dataKey={key}
-              dot={false}
-              stroke={commonColors[index % commonColors.length]}
-              animationDuration={0}
-            />
-          ))}
-        </LineChart>
-      </ResponsiveContainer>
+      <section className="bg-gray-850 p-6 rounded-xl shadow-md ring-1 ring-gray-700/50">
+        <h2 className="text-xl font-semibold mb-4">📊 Price Trends</h2>
+        <ResponsiveContainer width="100%" height={400}>
+          <LineChart data={chartData}>
+            <XAxis dataKey="name" stroke="#999" />
+            <YAxis stroke="#999" domain={["auto", "auto"]} />
+            <Tooltip contentStyle={{ backgroundColor: "#1f2937", border: "none" }} labelStyle={{ color: "#ccc" }} />
+            <Legend />
+            {stockKeys.map((key, index) => (
+              <Line
+                key={key}
+                type="monotone"
+                dataKey={key}
+                stroke={commonColors[index % commonColors.length]}
+                dot={false}
+                strokeWidth={2}
+                animationDuration={0}
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </section>
 
-      <div className="flex flex-wrap gap-6">
-        {Object.entries(stockData.stocks).map(([key, meta]) => (
-          <div key={key} className="bg-gray-900 p-5 rounded-lg border border-gray-800 shadow-sm text-base w-[340px]">
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="font-semibold text-lg">{key}</h2>
-              <div className="text-gray-400 text-sm text-right leading-snug">
+      <section className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {Object.entries(stocks).map(([key, meta]) => (
+          <div key={key} className="bg-gray-850 p-6 rounded-xl shadow-md ring-1 ring-gray-700/50 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold">{key}</h3>
+              <div className="text-sm text-gray-400 text-right">
                 <div>
-                  ${meta.price.at(-1)?.toFixed(2)} -&gt; {meta.target}
+                  ${meta.price.at(-1)?.toFixed(2)} → {meta.target}
                 </div>
                 <div>
                   {meta.remaining} steps / s = {meta.stability}
@@ -139,73 +140,42 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <label className="w-20 text-gray-400">Target</label>
+            {["target", "remaining", "stability"].map((field) => (
+              <div key={field} className="flex items-center gap-3">
+                <label className="w-24 capitalize text-gray-400">{field}</label>
                 <input
                   type="number"
-                  className="flex-1 px-3 py-1 rounded bg-gray-800 text-white border border-gray-700"
-                  value={editing[key]?.target ?? ""}
-                  placeholder={meta.target.toString()}
+                  step={field === "stability" ? "0.001" : "1"}
+                  className="flex-1 px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={editing[key]?.[field as keyof typeof meta] ?? ""}
+                  placeholder={meta[field as keyof typeof meta]?.toString()}
                   onChange={(e) =>
-                    setEditing({
-                      ...editing,
+                    setEditing((prev) => ({
+                      ...prev,
                       [key]: {
-                        ...editing[key],
-                        target: e.target.value === "" ? undefined : parseFloat(e.target.value),
+                        ...prev[key],
+                        [field]:
+                          e.target.value === ""
+                            ? undefined
+                            : field === "stability"
+                            ? parseFloat(e.target.value)
+                            : parseInt(e.target.value),
                       },
-                    })
+                    }))
                   }
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <label className="w-20 text-gray-400">Steps</label>
-                <input
-                  type="number"
-                  className="flex-1 px-3 py-1 rounded bg-gray-800 text-white border border-gray-700"
-                  value={editing[key]?.remaining ?? ""}
-                  placeholder={meta.remaining.toString()}
-                  onChange={(e) =>
-                    setEditing({
-                      ...editing,
-                      [key]: {
-                        ...editing[key],
-                        remaining: e.target.value === "" ? undefined : parseInt(e.target.value),
-                      },
-                    })
-                  }
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="w-20 text-gray-400">Stability</label>
-                <input
-                  type="number"
-                  step="0.001"
-                  className="flex-1 px-3 py-1 rounded bg-gray-800 text-white border border-gray-700"
-                  value={editing[key]?.stability ?? ""}
-                  placeholder={meta.stability.toString()}
-                  onChange={(e) =>
-                    setEditing({
-                      ...editing,
-                      [key]: {
-                        ...editing[key],
-                        stability: e.target.value === "" ? undefined : parseFloat(e.target.value),
-                      },
-                    })
-                  }
-                />
-              </div>
-            </div>
+            ))}
 
             <button
               onClick={() => updateStock(key)}
-              className="w-full mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-base"
+              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition"
             >
-              Apply
+              Apply Changes
             </button>
           </div>
         ))}
-      </div>
+      </section>
     </main>
   );
 }
