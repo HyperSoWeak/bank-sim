@@ -26,4 +26,4 @@ This will concurrently launch both the frontend and backend servers.
 
 ## License
 
-This project is licensed under the ISC License.
+This project is licensed under the [GNU General Public License Version 3 (GPLv3)](LICENSE).
