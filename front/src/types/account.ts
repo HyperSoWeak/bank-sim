@@ -5,6 +5,8 @@ export type Account = {
   lastAction: string | null;
   lastTransaction: string | null;
   loanTime: string | null;
-  stocks: Record<string, number>;
-  stockProfit: number;
+  stockNetWorth: number;
+  stocks: {
+    [company: string]: number;
+  };
 };
