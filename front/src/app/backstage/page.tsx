@@ -130,6 +130,20 @@ export default function DashboardPage() {
           <div key={key} className="bg-gray-850 p-6 rounded-xl shadow-md ring-1 ring-gray-700/50 space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold">{key}</h3>
+              <span
+                className={
+                  editing[key]?.target && meta.price.at(-1)
+                    ? editing[key].target - meta.price.at(-1)! >= 0
+                      ? "text-green-500"
+                      : "text-red-500"
+                    : "text-gray-400"
+                }
+              >
+                {editing[key]?.target
+                  ? (((editing[key].target - meta.price.at(-1)!) / meta.price.at(-1)!) * 100).toFixed(1)
+                  : 0}
+                {"%"}
+              </span>
               <div className="text-sm text-gray-400 text-right">
                 <div>
                   ${meta.price.at(-1)?.toFixed(2)} → {meta.target}

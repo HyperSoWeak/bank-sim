@@ -316,7 +316,7 @@ export default function AccountPage() {
                   <div>
                     <div className="text-lg font-semibold">{company}</div>
                     <div className="text-sm text-gray-400">Price: ${price}</div>
-                    <div className="text-sm text-gray-400">You own: ${trimTo2Decimals(shares * price)}</div>
+                    <div className="text-sm text-gray-400">You own: ${trimTo2Decimals(shares * price!)}</div>
                   </div>
                   <div className="flex gap-2">
                     <button
