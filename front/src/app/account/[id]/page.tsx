@@ -50,6 +50,7 @@ export default function AccountPage() {
       const data = await stockRes.json();
       setStockData(data);
     };
+    fetchData();
     const interval = setInterval(() => fetchData(), STOCK_UPDATE_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [id]);
