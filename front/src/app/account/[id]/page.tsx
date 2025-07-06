@@ -164,6 +164,36 @@ export default function AccountPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white px-6 py-10 space-y-12">
+      {showPopup ? (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-6 rounded-lg shadow-md w-100">
+            <h2 className="text-lg font-semibold mb-4">{popUpTopic}</h2>
+            <input
+              type="number"
+              className="w-full border px-3 py-2 rounded mb-4"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value === "" ? "" : Number(e.target.value))}
+            />
+            <div className="flex justify-between">
+              <button
+                className="bg-red-600 px-3 py-1 rounded"
+                onClick={() => {
+                  setShowPopup(0);
+                  setInputValue("");
+                }}
+              >
+                Cancel
+              </button>
+              <button className="bg-green-600 text-white px-3 py-1 rounded" onClick={handleSubmit}>
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-gray-800 pb-6">
         <div>
