@@ -2,22 +2,31 @@
   {
     "id": "0421",
     "name": "Alice",
-    "balance": 2.5256970328264744e+35,
-    "lastAction": "2025-07-06T00:17:41.385Z",
-    "lastTransaction": "2025-07-02T15:55:09.367Z",
-    "loanTime": null,
-    "stockNetWorth": -123,
-    "stocks": {
-      "AAPL": 0.17246535299618287
-    }
-  },
-  {
-    "id": "1337",
-    "name": "Bob",
-    "balance": 3000,
+    "balance": 0,
     "lastAction": null,
     "lastTransaction": null,
     "loanTime": null,
-    "stockNetWorth": 0
+    "stockNetWorth": 0,
+    "stocks": {}
+  },
+  {
+    "id": "0835",
+    "name": "Bob",
+    "balance": 0,
+    "lastAction": null,
+    "lastTransaction": null,
+    "loanTime": null,
+    "stockNetWorth": 0,
+    "stocks": {}
+  },
+  {
+    "id": "1337",
+    "name": "Hyper",
+    "balance": 0,
+    "lastAction": null,
+    "lastTransaction": null,
+    "loanTime": null,
+    "stockNetWorth": 0,
+    "stocks": {}
   }
 ]
