@@ -1,81 +1,46 @@
 {
-  "lastUpdate": "2025-07-08T13:25:43.361Z",
+  "lastUpdate": "2025-07-08T16:30:21.507Z",
   "marquee": "Stocks are updated every 30 seconds. The prices are based on the latest market data.",
   "stocks": {
     "Rust": {
       "price": [
-        182.71,
-        182.06,
-        182.79,
-        187.94,
-        188.67,
-        188.78,
-        189.13,
-        193.17
+        182.71
       ],
       "target": 200.82,
-      "remaining": 3,
+      "remaining": 10,
       "stability": 0.79
     },
     "Python": {
       "price": [
-        297.85,
-        303.21,
-        308.22,
-        314.59,
-        323.61,
-        329.73,
-        337.09,
-        343.35
+        297.85
       ],
-      "target": 404.67,
-      "remaining": 13,
-      "stability": 0.1166
+      "target": 334.12,
+      "remaining": 6,
+      "stability": 0.21
     },
     "C++": {
       "price": [
-        242.56,
-        237.52,
-        231.91,
-        226.5,
-        216.67,
-        208.66,
-        201.56,
-        194.08
+        242.56
       ],
-      "target": 198.08,
+      "target": 208.08,
       "remaining": 10,
-      "stability": 0.951
+      "stability": 0.13
     },
     "Scratch": {
       "price": [
-        193.81,
-        185.88,
-        179.24,
-        177.66,
-        177.97,
-        175.94,
-        174.67,
-        171.1
+        193.81
       ],
       "target": 159.27,
-      "remaining": 5,
-      "stability": 0.65
+      "remaining": 12,
+      "stability": 0.56
     },
     "Java": {
       "price": [
-        233.29,
-        233.09,
-        230.5,
-        228.69,
-        227.78,
-        226.75,
-        224.33,
-        221.82
+        233.29
       ],
-      "target": 216.25,
-      "remaining": 2,
-      "stability": 0.47
+      "target": 220.42,
+      "remaining": 10,
+      "stability": 0.4
     }
   }
 }
