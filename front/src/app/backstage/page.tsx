@@ -6,9 +6,17 @@ import { StockData } from "@/types/stock";
 import { STOCK_UPDATE_INTERVAL_MS } from "@/shared/constants";
 
 const DASHBOARD_API = "http://localhost:4000/stocks";
+const ACCOUNTS_API = "http://localhost:4000/accounts";
+
+interface StockAggregation {
+  totals: Record<string, number>;
+  max: { symbol: string; amount: number } | null;
+  min: { symbol: string; amount: number } | null;
+}
 
 export default function DashboardPage() {
   const [stockData, setStockData] = useState<StockData | null>(null);
+  const [stockAggregation, setStockAggregation] = useState<StockAggregation | null>(null);
   const [marqueeText, setMarqueeText] = useState<string>("");
   const [editing, setEditing] = useState<Record<string, { target?: number; remaining?: number; stability?: number }>>(
     {}
@@ -18,6 +26,16 @@ export default function DashboardPage() {
     const res = await fetch(DASHBOARD_API);
     const data = await res.json();
     setStockData(data);
+  };
+
+  const fetchStockAggregation = async () => {
+    try {
+      const res = await fetch(`${DASHBOARD_API}/aggregation`);
+      const data = await res.json();
+      setStockAggregation(data);
+    } catch (error) {
+      console.error("Failed to fetch stock aggregation:", error);
+    }
   };
 
   const updateStock = async (key: string) => {
@@ -56,7 +74,11 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchStocks();
-    const interval = setInterval(fetchStocks, STOCK_UPDATE_INTERVAL_MS);
+    fetchStockAggregation();
+    const interval = setInterval(() => {
+      fetchStocks();
+      fetchStockAggregation();
+    }, STOCK_UPDATE_INTERVAL_MS);
     return () => clearInterval(interval);
   }, []);
 
@@ -199,8 +221,8 @@ export default function DashboardPage() {
                   type="number"
                   step={field === "stability" ? "0.001" : "1"}
                   className="flex-1 px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:ring-2 focus:ring-blue-500 outline-none"
-                  value={editing[key]?.[field as keyof typeof meta] ?? ""}
-                  placeholder={meta[field as keyof typeof meta]?.toString()}
+                  value={editing[key]?.[field as keyof Pick<typeof meta, 'target' | 'remaining' | 'stability'>] ?? ""}
+                  placeholder={meta[field as keyof Pick<typeof meta, 'target' | 'remaining' | 'stability'>]?.toString()}
                   onChange={(e) =>
                     setEditing((prev) => ({
                       ...prev,
@@ -239,6 +261,54 @@ export default function DashboardPage() {
           </div>
         ))}
       </section>
+
+      {stockAggregation && Object.keys(stockAggregation.totals).length > 0 && (
+        <section className="bg-gray-850 p-6 rounded-xl shadow-md ring-1 ring-gray-700/50">
+          <h2 className="text-xl font-semibold mb-4">📊 Stock Holdings Aggregation</h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {stockAggregation.max && (
+              <div className="bg-green-900/20 border border-green-700/50 p-4 rounded-lg">
+                <h3 className="text-green-400 font-semibold mb-2">Most Held Stock (make it fall)</h3>
+                <p className="text-2xl font-mono text-green-300">
+                  {stockAggregation.max.symbol}: {stockAggregation.max.amount.toFixed(2)}
+                </p>
+              </div>
+            )}
+
+            {stockAggregation.min && (
+              <div className="bg-red-900/20 border border-red-700/50 p-4 rounded-lg">
+                <h3 className="text-red-400 font-semibold mb-2">Least Held Stock (make it rise)</h3>
+                <p className="text-2xl font-mono text-red-300">
+                  {stockAggregation.min.symbol}: {stockAggregation.min.amount.toFixed(2)}
+                </p>
+              </div>
+            )}
+
+            <div className="bg-blue-900/20 border border-blue-700/50 p-4 rounded-lg">
+              <h3 className="text-blue-400 font-semibold mb-2">Total Types</h3>
+              <p className="text-2xl font-mono text-blue-300">
+                {Object.keys(stockAggregation.totals).length} stocks
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-3">All Stock Holdings</h3>
+            <div className="flex gap-3">
+              {Object.entries(stockAggregation.totals)
+                .sort(([, a], [, b]) => b - a)
+                .map(([symbol, total]) => (
+                  <div key={symbol} className="bg-gray-800/50 p-3 rounded-lg border border-gray-700/50 flex-1">
+                    <div className="flex flex-col items-center">
+                      <span className="font-medium text-gray-300 text-sm">{symbol}</span>
+                      <span className="font-mono text-white text-lg">{total.toFixed(2)}</span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </section>
+      )}
     </main>
   );
 }

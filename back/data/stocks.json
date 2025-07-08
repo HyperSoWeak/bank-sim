@@ -1,35 +1,80 @@
 {
-  "lastUpdate": "2025-07-06T00:20:03.996Z",
+  "lastUpdate": "2025-07-08T13:25:43.361Z",
   "marquee": "Stocks are updated every 30 seconds. The prices are based on the latest market data.",
   "stocks": {
-    "AAPL": {
-      "price": [236.64],
-      "target": 273.82,
-      "remaining": 9,
-      "stability": 0.73
+    "Rust": {
+      "price": [
+        182.71,
+        182.06,
+        182.79,
+        187.94,
+        188.67,
+        188.78,
+        189.13,
+        193.17
+      ],
+      "target": 200.82,
+      "remaining": 3,
+      "stability": 0.79
     },
-    "GOOG": {
-      "price": [246.76],
-      "target": 268.73,
-      "remaining": 12,
-      "stability": 0.41
+    "Python": {
+      "price": [
+        297.85,
+        303.21,
+        308.22,
+        314.59,
+        323.61,
+        329.73,
+        337.09,
+        343.35
+      ],
+      "target": 404.67,
+      "remaining": 13,
+      "stability": 0.1166
     },
-    "AMZN": {
-      "price": [124.63],
-      "target": 136.03,
-      "remaining": 7,
-      "stability": 0.28
+    "C++": {
+      "price": [
+        242.56,
+        237.52,
+        231.91,
+        226.5,
+        216.67,
+        208.66,
+        201.56,
+        194.08
+      ],
+      "target": 198.08,
+      "remaining": 10,
+      "stability": 0.951
     },
-    "MSFT": {
-      "price": [198.4],
-      "target": 170.27,
-      "remaining": 11,
-      "stability": 0.69
+    "Scratch": {
+      "price": [
+        193.81,
+        185.88,
+        179.24,
+        177.66,
+        177.97,
+        175.94,
+        174.67,
+        171.1
+      ],
+      "target": 159.27,
+      "remaining": 5,
+      "stability": 0.65
     },
-    "TSLA": {
-      "price": [168.1],
-      "target": 152.25,
-      "remaining": 9,
+    "Java": {
+      "price": [
+        233.29,
+        233.09,
+        230.5,
+        228.69,
+        227.78,
+        226.75,
+        224.33,
+        221.82
+      ],
+      "target": 216.25,
+      "remaining": 2,
       "stability": 0.47
     }
   }
