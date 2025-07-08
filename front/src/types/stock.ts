@@ -7,6 +7,7 @@ export interface StockMeta {
 
 export interface StockData {
   lastUpdate: string;
+  marquee: string;
   stocks: {
     [key: string]: StockMeta;
   };

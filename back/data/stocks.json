@@ -1,5 +1,6 @@
 {
   "lastUpdate": "2025-07-06T00:20:03.996Z",
+  "marquee": "Stocks are updated every 30 seconds. The prices are based on the latest market data.",
   "stocks": {
     "AAPL": {
       "price": [236.64],

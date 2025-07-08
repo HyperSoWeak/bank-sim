@@ -64,6 +64,22 @@ app.get("/stocks", async (req, res) => {
   }
 });
 
+app.post("/stocks/marquee", async (req, res) => {
+  const { marquee } = req.body;
+  try {
+    const data = await fs.readFile(stocksPath, "utf-8");
+    const json = JSON.parse(data);
+
+    json.marquee = marquee;
+
+    await fs.writeFile(stocksPath, JSON.stringify(json, null, 2));
+    res.json({ message: "Marquee updated." });
+  } catch (err) {
+    console.error("Failed to update marquee:", err);
+    res.status(500).json({ error: "Failed to update marquee" });
+  }
+});
+
 // POST update a single stock's control values
 app.post("/stocks/:symbol", async (req, res) => {
   const { symbol } = req.params;

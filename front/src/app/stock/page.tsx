@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { STOCK_UPDATE_INTERVAL_MS } from "@/shared/constants";
 import { StockData } from "@/types/stock";
 
 const STOCK_API = "http://localhost:4000/stocks";
@@ -18,7 +17,7 @@ export default function StockPage() {
 
   useEffect(() => {
     fetchStocks();
-    const interval = setInterval(fetchStocks, STOCK_UPDATE_INTERVAL_MS);
+    const interval = setInterval(fetchStocks, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -103,6 +102,29 @@ export default function StockPage() {
           </LineChart>
         </ResponsiveContainer>
       </section>
+
+      <div className="fixed bottom-0 left-0 w-full bg-gray-900 text-white py-2 overflow-hidden shadow-lg border-t border-gray-700">
+        <div
+          className="whitespace-nowrap animate-marquee"
+          style={{
+            display: "inline-block",
+            minWidth: "100%",
+            animation: "marquee 20s linear infinite",
+          }}
+        >
+          <span className={`mx-4 text-xl font-semibold text-white`}>{stockData.marquee}</span>
+        </div>
+        <style jsx global>{`
+          @keyframes marquee {
+            0% {
+              transform: translateX(100%);
+            }
+            100% {
+              transform: translateX(-100%);
+            }
+          }
+        `}</style>
+      </div>
     </main>
   );
 }

@@ -9,6 +9,7 @@ const DASHBOARD_API = "http://localhost:4000/stocks";
 
 export default function DashboardPage() {
   const [stockData, setStockData] = useState<StockData | null>(null);
+  const [marqueeText, setMarqueeText] = useState<string>("");
   const [editing, setEditing] = useState<Record<string, { target?: number; remaining?: number; stability?: number }>>(
     {}
   );
@@ -34,6 +35,16 @@ export default function DashboardPage() {
       body: JSON.stringify(payload),
     });
     fetchStocks();
+  };
+
+  const updateMarquee = async () => {
+    await fetch(`${DASHBOARD_API}/marquee`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ marquee: marqueeText }),
+    });
+    fetchStocks();
+    setMarqueeText("");
   };
 
   useEffect(() => {
@@ -127,6 +138,25 @@ export default function DashboardPage() {
       </section>
 
       <section className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="bg-gray-850 p-6 rounded-xl shadow-md ring-1 ring-gray-700/50 space-y-4">
+          <div className="flex flex-col items-begin">
+            <h2 className="text-xl font-semibold mb-4">Marquee Text</h2>
+            <input
+              type="text"
+              value={marqueeText}
+              onChange={(e) => setMarqueeText(e.target.value)}
+              placeholder={stockData.marquee}
+              className="flex-grow p-2 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <button
+            onClick={() => updateMarquee()}
+            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition"
+          >
+            Apply Changes
+          </button>
+        </div>
+
         {Object.entries(stocks).map(([key, meta]) => (
           <div key={key} className="bg-gray-850 p-6 rounded-xl shadow-md ring-1 ring-gray-700/50 space-y-4">
             <div className="flex justify-between items-center">
