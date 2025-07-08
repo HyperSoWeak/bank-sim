@@ -102,6 +102,38 @@ export default function DashboardPage() {
     return entry;
   });
 
+  // Dynamic interval based on data points
+  const dataPointCount = chartData.length;
+
+  // Custom tick formatter to always show the latest point
+  const customTicks = () => {
+    if (dataPointCount < 20) {
+      return undefined; // Use default ticks
+    } else {
+      const ticks = [];
+      // Add every 5th tick as strings to match dataKey format
+      for (let i = 0; i < dataPointCount; i += 5) {
+        ticks.push(i.toString());
+      }
+      // Add the last point if it's not already included, with exception for 100+ points
+      const lastIndex = (dataPointCount - 1).toString();
+      if (!ticks.includes(lastIndex)) {
+        // If there are over 100 points and last index is adjacent to the last tick, don't add it
+        if (dataPointCount > 100) {
+          const lastTickIndex = parseInt(ticks[ticks.length - 1]);
+          const actualLastIndex = dataPointCount - 1;
+          if ((actualLastIndex - lastTickIndex) <= 2) {
+            // Don't add the last index as it's adjacent to the last tick
+            return ticks;
+          }
+        }
+        ticks.push(lastIndex);
+      }
+      
+      return ticks;
+    }
+  };
+
   const current: Record<string, number> = {};
   const prev: Record<string, number> = {};
   const diff: Record<string, string> = {};
@@ -129,12 +161,12 @@ export default function DashboardPage() {
       </div>
 
       <section className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
-        {stockKeys.map((key) => (
+        {stockKeys.map((key, index) => (
           <div
             key={key}
             className="bg-gray-850 p-6 rounded-xl shadow-md ring-1 ring-gray-700/50 text-center transition hover:shadow-xl"
           >
-            <h2 className="text-lg font-semibold mb-2">{key}</h2>
+            <h2 className="text-lg font-semibold mb-2" style={{ color: commonColors[index % commonColors.length] }}>{key}</h2>
             <p className="text-blue-400 text-2xl font-mono">${current[key].toFixed(2)}</p>
             <p className={`mt-2 text-md font-medium ${Number(diff[key]) >= 0 ? "text-green-400" : "text-red-400"}`}>
               {numberWithSign(Number(diff[key]))}%
@@ -146,11 +178,25 @@ export default function DashboardPage() {
       <section className="bg-gray-850 p-6 rounded-xl shadow-md ring-1 ring-gray-700/50">
         <h2 className="text-xl font-semibold mb-4">📊 Price Trends</h2>
         <ResponsiveContainer width="100%" height={400}>
-          <LineChart data={chartData}>
-            <XAxis dataKey="name" stroke="#999" />
+          <LineChart data={chartData} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
+            <XAxis 
+              dataKey="name" 
+              stroke="#999" 
+              interval={dataPointCount < 20 ? 0 : 0}
+              ticks={customTicks()}
+              tick={{ fontSize: 11 }}
+              height={50}
+            />
             <YAxis stroke="#999" domain={["auto", "auto"]} />
             <Tooltip contentStyle={{ backgroundColor: "#1f2937", border: "none" }} labelStyle={{ color: "#ccc" }} />
-            <Legend />
+            <Legend
+              wrapperStyle={{ 
+                fontSize: '20px', 
+                fontWeight: 'normal' 
+              }}
+              iconType="line"
+              formatter={(value) => <span style={{ marginRight: '30px' }}>{value}</span>}
+            />
             {stockKeys.map((key, index) => (
               <Line
                 key={key}
