@@ -6,31 +6,31 @@
       "price": [236.64],
       "target": 273.82,
       "remaining": 9,
-      "stability": 0.0564
+      "stability": 0.73
     },
     "GOOG": {
       "price": [246.76],
       "target": 268.73,
       "remaining": 12,
-      "stability": 0.043
+      "stability": 0.41
     },
     "AMZN": {
       "price": [124.63],
       "target": 136.03,
       "remaining": 7,
-      "stability": 0.0404
+      "stability": 0.28
     },
     "MSFT": {
       "price": [198.4],
       "target": 170.27,
       "remaining": 11,
-      "stability": 0.0108
+      "stability": 0.69
     },
     "TSLA": {
       "price": [168.1],
       "target": 152.25,
       "remaining": 9,
-      "stability": 0.0242
+      "stability": 0.47
     }
   }
 }

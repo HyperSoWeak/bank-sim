@@ -22,7 +22,7 @@ export const updateStocks = async () => {
 
     const t = stock.remaining > 0 ? 1 / stock.remaining : 1;
     const base = lerp(currentPrice, stock.target, t);
-    const noise = (((Math.random() - 0.5) * stock.stability * (stock.target - currentPrice)) / currentPrice) * 10;
+    const noise = ((Math.random() - 0.5) * stock.stability * (stock.target - currentPrice)) / currentPrice / 2;
     const nextPrice = parseFloat((base * (1 + noise)).toFixed(2));
 
     stock.price.push(nextPrice);
@@ -37,8 +37,8 @@ export const updateStocks = async () => {
       while (stock.target < 10) {
         stock.target = parseFloat((nextPrice * (1 + randomInRange(0.1, 0.3))).toFixed(2));
       }
-      stock.remaining = Math.floor(randomInRange(8, 15));
-      stock.stability = parseFloat(randomInRange(0.01, 0.06).toFixed(4));
+      stock.remaining = Math.floor(randomInRange(8, 16));
+      stock.stability = parseFloat(randomInRange(0.1, 1.0).toFixed(4));
     }
   }
 
