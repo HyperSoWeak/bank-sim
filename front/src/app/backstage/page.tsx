@@ -151,7 +151,7 @@ export default function DashboardPage() {
     return num >= 0 ? `+${num}` : num;
   };
 
-  const commonColors = ["#00C49F", "#8884d8", "#FFBB28", "#FF8042", "#AF19FF", "#DE3163"];
+  const commonColors = ["#e3712c", "#9a9d6a", "#659ad2", "#f9a83a", "#ed181d"];
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white px-6 py-16 space-y-10">
