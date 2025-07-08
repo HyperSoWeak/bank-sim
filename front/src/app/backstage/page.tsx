@@ -21,6 +21,7 @@ export default function DashboardPage() {
 
   const updateStock = async (key: string) => {
     const payload = editing[key];
+    editing[key] = {};
     const currentMeta = stockData?.stocks[key];
     if (!payload || !currentMeta) return;
     payload.target = payload.target ?? currentMeta.target;
@@ -171,9 +172,9 @@ export default function DashboardPage() {
                         [field]:
                           e.target.value === ""
                             ? undefined
-                            : field === "stability"
-                            ? parseFloat(e.target.value)
-                            : parseInt(e.target.value),
+                            : field === "remaining"
+                            ? parseInt(e.target.value)
+                            : parseFloat(e.target.value),
                       },
                     }))
                   }
